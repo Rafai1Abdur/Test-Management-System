@@ -1,0 +1,62 @@
+# ===== Node / frontend =====
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+npm-debug.log*
+
+# ===== Python / backend =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.pyre/
+
+# ===== Environment & secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+*.crt
+secrets/
+
+# ===== IDE / editor =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS =====
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ===== Local data / storage =====
+.storage/
+data/
+uploads/
+tmp/
+downloads/
+wsl-data/
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Evals artifacts =====
+evals/results/
+*.npz
+*.onnx
+models_cache/

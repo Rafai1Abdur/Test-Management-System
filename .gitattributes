@@ -1,0 +1,41 @@
+# ===== Line endings =====
+# The dev environment is Windows 11 + Docker Desktop + WSL2.
+# Force LF for text files repository-wide to keep container builds and
+# WSL2 mount behavior predictable. Checkout can still use autocrlf locally.
+* text=auto eol=lf
+
+*.md    text eol=lf
+*.markdown text eol=lf
+*.py    text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.json  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.ini   text eol=lf
+*.cfg   text eol=lf
+*.dockerfile text eol=lf
+Dockerfile text eol=lf
+*.sh    text eol=lf
+*.ps1   text eol=lf
+
+# ===== Binary files =====
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.tiff  binary
+*.gif   binary
+*.docx  binary
+*.xlsx  binary
+*.pptx  binary
+*.epub  binary
+*.zip   binary
+*.gz    binary
+*.woff  binary
+*.woff2 binary
+*.ico   binary
