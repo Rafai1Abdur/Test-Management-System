@@ -39,6 +39,8 @@ lifecycle from drafting through printing, grading, and archival.
 - Every key view/download/print → `exam_access_audit` entry (who/when/what/ip).
 - Keys never embedded in student-facing payloads or frontend bundles; download via
   short-lived signed URLs only.
+- Separation of duties: the answer-key approver for an exam must not be the sole
+  final verifier of that exam's gradings (AUTH_RBAC §2b, GRADING).
 
 ## 5. Publication locking & change control
 
@@ -55,9 +57,15 @@ lifecycle from drafting through printing, grading, and archival.
 - An exam's scope/coverage is materialized at blueprint creation from approved **locked**
   teaching coverage and frozen at exam `READY` (recorded as `syllabus_snapshot` +
   `scope_snapshot` coverage hash).
-- **If teaching coverage changes after an exam reaches APPROVED/PUBLISHED:** the change is
+- **If teaching coverage changes after an exam reaches `READY` (syllabus freeze) or
+  `PUBLISHED`:** the change is
   audited, the existing exam/version is NOT silently mutated; a **new exam version** is
   required (or, for a draft, re-resolution via `resolve-scope`).
+- Blueprint revisions: once a derived exam is beyond DRAFT (especially at/after READY),
+  blueprint edits that would change generation semantics (scope, question specs,
+  weighting) require a **new blueprint revision** (`rev++`); every generation run records
+  the blueprint `rev` used — a published exam can never silently change because of a
+  later blueprint edit.
 - Pass/edit-guardrails: generation revalidates the materialized scope against current
   coverage and **fails closed** (no out-of-scope content, no silent expansion).
 - Coverage changes that would invalidate a **published** exam produce an integrity alert to

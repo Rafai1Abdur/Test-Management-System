@@ -95,12 +95,12 @@ assessment extension (FR-56 … FR-63). NFRs are lettered (NFR-A …).
 | ID | Requirement |
 |---|---|
 | FR-56 **Assessment periods** | Multiple assessment periods within an academic year (First/Second/Third Term, Quarter 1–3, Mid-Term, Final Term, custom school-defined). Period ≠ exam. Ordered; PLANNED/ACTIVE/CLOSED |
-| FR-57 **Teaching/curriculum coverage** | Record taught chapters per (year, period, subject, optional class/section). States `NOT_STARTED\|IN_PROGRESS\|COMPLETED\|EXCLUDED`; chapter-level mandatory, section/topic-level optional; class/section-specific coverage overrides grade+subject default; teachers + authorized admins update |
+| FR-57 **Teaching/curriculum coverage** | Record taught chapters per (year, period, subject, optional class/section). States `NOT_STARTED\|IN_PROGRESS\|COMPLETED\|EXCLUDED`; chapter-level mandatory, section/topic-level optional; class/section-specific coverage is merged with the grade+subject default **per chapter** (override wins where both exist; default applies where the override omits a chapter); teachers + authorized admins update |
 | FR-58 **Examination sets** | Group exams of a period (grade, class/section scope, subjects, status, publication state, advisory schedule) |
-| FR-59 **Examination scope modes** | `NEW_ONLY \| CUMULATIVE \| SELECTED_CHAPTERS \| FULL_SYLLABUS \| CUSTOM`; scope derived from approved teaching coverage |
+| FR-59 **Examination scope modes** | `NEW_ONLY \| CUMULATIVE \| SELECTED_CHAPTERS \| FULL_SYLLABUS \| CUSTOM`; scope derived from approved teaching coverage (deterministic resolution algorithms: EXAM_ENGINE §2b) |
 | FR-60 **Syllabus-aware generation** | **Never** auto-generate questions from chapters outside approved examination scope AND approved teaching coverage (`generation_scope ⊆ approved_teaching_coverage ∩ blueprint_scope`); fail closed |
 | FR-61 **Chapter/section weighting** | Optional per-chapter weighting; generated exam validates marks distribution within configurable tolerance (default ±10 percentage points, absolute) |
-| FR-62 **Syllabus lock** | Coverage/scope immutable once exam APPROVED/PUBLISHED; post-publication coverage change ⇒ new exam version, never silent mutation |
+| FR-62 **Syllabus lock** | Coverage/scope immutable once exam reaches `READY` (syllabus freeze) or `PUBLISHED` (no `APPROVED` exam state exists); post-publication coverage change ⇒ new exam version, never silent mutation |
 | FR-63 **Period reporting dimension** | `assessment_period_id` (+ year, examination set) propagates to student/class/subject results, chapter performance, analytics, and report cards |
 
 ## Cross-cutting functional requirements

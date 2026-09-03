@@ -30,9 +30,13 @@ exams of the same period (an "Examination Set") cannot be scheduled/published as
    *optional* class/section). **Chapter-level is mandatory**; section/topic-level is
    optional. Coverage states: `NOT_STARTED | IN_PROGRESS | COMPLETED | EXCLUDED`.
 
-   **Inheritance/resolution:** class/section-specific coverage is used when present;
-   otherwise the grade+subject default coverage applies (fallback). Documented as an
-   explicit resolution rule.
+   **Inheritance/resolution (chapter-level merge):** resolved coverage for
+   `(class, section)` is calculated **per chapter** by combining the grade+subject default
+   coverage with the class/section-specific coverage. Where a chapter exists in both
+   records, the class/section override status wins; where a chapter exists only in the
+   default record, the default status applies. This is a **chapter-level merge**, not
+   record-level replacement — a partial class/section override must never be interpreted
+   as "all other chapters do not exist." Documented as an explicit resolution rule.
 
 4. **Coverage locking:** coverage-level state machine `DRAFT → REVIEWED → LOCKED`. An exam
    can require locked coverage depending on school configuration. Once locked for an exam
@@ -45,9 +49,11 @@ exams of the same period (an "Examination Set") cannot be scheduled/published as
    to enable hard scheduling windows later.
 
 6. **Exam scope modes** — `NEW_ONLY | CUMULATIVE | SELECTED_CHAPTERS | FULL_SYLLABUS |
-   CUSTOM`. **Syllabus lock:** once an exam reaches APPROVED/PUBLISHED, its
-   scope/coverage is immutable; post-publication coverage changes require a new exam
-   version (never silent mutation).
+   CUSTOM`. **Syllabus lock:** once an exam reaches `READY` (syllabus freeze) or
+   `PUBLISHED`, its scope/coverage is immutable (the exam lifecycle has no `APPROVED`
+   state); post-publication coverage changes require a new exam version (never silent
+   mutation). Per-mode resolution algorithms and the generation-eligibility rule are
+   defined in EXAM_ENGINE §2b.
 
 7. **Scope resolution = materialization + revalidation:**
    - At **blueprint creation**: resolve the requested scope from approved/locked teaching
@@ -66,6 +72,9 @@ exams of the same period (an "Examination Set") cannot be scheduled/published as
    scope and the approved teaching/curriculum coverage. RAG becomes **syllabus-aware**:
    retrieval scope conceptually = Academic Year + Assessment Period + Subject + Grade +
    Approved Teaching Coverage + Selected Chapters/Sections + Approved Learning Materials.
+   Generation-eligible coverage status is `COMPLETED` only (MVP): `NOT_STARTED`/
+   `IN_PROGRESS` are out of scope, and `EXCLUDED` is forbidden even if explicitly
+   selected; no scope mode or blueprint selection bypasses coverage eligibility.
 
 9. **Chapter/section weighting** — optional teacher-defined percentages per chapter;
    tolerance default **±10 percentage points (absolute percentage-point deviation, not

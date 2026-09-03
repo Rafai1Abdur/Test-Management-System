@@ -9,7 +9,7 @@ ADR before implementation.
 
 - The repository was **empty** (0 files, no `.git`) when inspected on 2026-09-02.
 - This phase created **documentation only**. No application code, services, or databases exist.
-- No Git commit has been created yet (intentional — pending approval).
+- Baseline committed (`docs: establish architecture and assessment model baseline`).
 
 ## Documentation map
 
@@ -53,7 +53,7 @@ ADR before implementation.
 | [ROADMAP.md](ROADMAP.md) | Phases 0–11 with objectives, dependencies, deliverables, acceptance criteria, risks, tests |
 | [RISKS.md](RISKS.md) | Risk register with mitigations |
 
-**ADR index**: [ADR/README.md](ADR/README.md) — 16 records, see [ADR/](ADR/) for details.
+**ADR index**: [ADR/README.md](ADR/README.md) — 17 records (ADR-0001–0017), see [ADR/](ADR/) for details.
 
 ## Core architectural principles (invariants)
 

@@ -61,6 +61,10 @@ context for the teacher and for post-hoc audits.
 These are physically distinct fields. No pipeline writes `final_marks` except the
 teacher-approval path (domain-enforced).
 
+**Separation of duties:** the answer-key approver of an exam must not be the sole final
+verifier of that exam's gradings (AUTH_RBAC §2b); verification assignment excludes the
+key approver as sole finalizer.
+
 ## 6. Verification-driven scores
 
 - `APPROVED` via teacher accept (bulk-accept allowed for above-threshold items, still a

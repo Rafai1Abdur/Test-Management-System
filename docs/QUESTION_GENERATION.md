@@ -50,6 +50,13 @@ Scope validations added to the pipeline:
   scope — out-of-scope candidates are rejected before review (scope is never silently expanded).
 - **Weighting adherence**: marks distribution per chapter must match requested weights within
   tolerance; deviations surface as warnings/errors per school config (metrics in §9).
+- **Coverage eligibility (MVP)**: only `COMPLETED` coverage is generation-eligible;
+  `NOT_STARTED`/`IN_PROGRESS` chapters are out of scope and `EXCLUDED` chapters are
+  forbidden even if explicitly selected — a chapter with any of those statuses produces
+  zero generated candidates (EXAM_ENGINE §2b).
+- **Choice groups** ("attempt any N of M") are generated/validated as explicit blueprint
+  `choice_groups`; assembly/publish enforce `attempt_count ≤ question_count` and marks
+  accounting for maximum attainable marks (EXAM_ENGINE §3).
 
 ## 3. Structural validation (per type)
 

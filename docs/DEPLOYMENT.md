@@ -18,7 +18,8 @@ Production host: Linux VPS/on-prem box recommended; the same compose stack runs 
 
 ## 2. Windows 11 + Docker Desktop + WSL2 — dev environment (MANDATORY READING)
 
-Development on this machine (Windows, repo on `G:\`) uses Docker Desktop with a WSL2 engine.
+Development on this machine (Windows; repo on a Windows drive — drive letter is
+environment-specific) uses Docker Desktop with a WSL2 engine.
 
 ### 2.1 Prerequisites (`scripts/check_env.ps1` will verify)
 - Windows 11, Docker Desktop ≥ 4.x with **WSL2 backend** (`wsl --status`), `wsl -l -v`.
@@ -28,7 +29,7 @@ Development on this machine (Windows, repo on `G:\`) uses Docker Desktop with a 
 - Python 3.11+ for local tooling (optional), `uv`/pipenv per developer preference.
 
 ### 2.2 CRITICAL: persistent storage must live on the WSL2 filesystem
-- **Never bind-mount the `G:` drive filesystem into containers for persistent databases.**
+- **Never bind-mount the Windows drive (e.g. `G:`) filesystem into containers for persistent databases.
   The `//g/...` 9P-backed mounts are slow, and MongoDB/Qdrant/MinIO rely on mmap/flock and
   sync semantics that are unreliable/severely degraded on 9P.
 - Use **named volumes** (created inside the WSL2 VM, stored under `docker-desktop-data`'s

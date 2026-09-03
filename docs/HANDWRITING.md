@@ -8,8 +8,9 @@ requirement, from day one, is:
 > Multi-model handwriting recognition **with confidence scoring and human verification**,
 > prioritizing **English and Urdu**, extensible to further languages.
 
-Urdu handwriting is explicitly **in scope architecturally from the start** (Phase 1 design;
-Phase 2 delivery) — same pipeline, stricter gates, extra evaluation data.
+Urdu handwriting is explicitly **in scope architecturally from the start** (design from
+Phase 1; delivery in **Roadmap Phase 7** — the release-phase "Phase 2" lane in
+PROJECT_OVERVIEW, not Roadmap Phase 2) — same pipeline, stricter gates, extra evaluation data.
 
 ## 2. Multi-model consensus pipeline
 
@@ -43,14 +44,14 @@ Thresholds are configurable per school/task. **No handwriting output is ever fed
 grading without a confidence + status flag**; low-confidence regions show the crop in the
 teacher verification UI with ALL hypotheses side-by-side.
 
-## 4. English handwriting (MVP lane, Phase 1 design / Phase 6-7)
+## 4. English handwriting (MVP lane, design from Phase 1 / delivery Roadmap Phase 7)
 
 - Engines: local HTR (PaddleOCR-en), VLM (e.g., Qwen-VL) consensus; Tesseract as weak
   fallback/word-clues.
 - Normalization: standard spelling normalization for grading (numeric vs words).
 - EVAL: golden EN handwriting dataset; CER/WER gates.
 
-## 5. Urdu handwriting (Phase 2 lane — same architecture)
+## 5. Urdu handwriting (Roadmap Phase 7 lane — same architecture; release-phase "Phase 2" in PROJECT_OVERVIEW)
 
 - Engines: PaddleOCR-UR / Urdu-capable HTR models; VLM with Urdu prompt pack; consensus.
 - Special handling: Nastalique joining (context-sensitive), diacritics/izafat, RTL line

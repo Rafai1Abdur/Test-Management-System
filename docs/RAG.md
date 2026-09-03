@@ -31,8 +31,8 @@ Every caller supplies a `RetrievalScope`:
 | `school_id` | `...` | mandatory |
 | `academic_year_id` | `2026-27` | mandatory |
 | `assessment_period_id?` | `q1-2026` | when present: coverage-mode scope resolution applies (ADR-0017) |
-| `coverage_mode` | `CUMULATIVE` | scope-mode of the blueprint; expands across periods for cumulative/full |
-| `approved_coverage_only` | `true` | hard filter: only chapters with `COMPLETED` (or explicitly EXCLUDED-aware) coverage status |
+| `coverage_mode` | `CUMULATIVE` | scope-mode of the blueprint; CUMULATIVE expands across ordered periods **within the same academic year** (resolution algorithms: EXAM_ENGINE §2b) |
+| `approved_coverage_only` | `true` | hard filter: **only `COMPLETED` coverage is generation-eligible** — `NOT_STARTED` and `IN_PROGRESS` are out of scope; `EXCLUDED` is explicitly forbidden even if selected (EXAM_ENGINE §2b) |
 | `material_ids[]` | allowlist | exam generation: **only blueprint-selected** materials |
 | `subject_id`, `chapter_ids[]`, `section_ids[]` | | curriculum pins, derived from resolved scope |
 | `grade`, `language` | `9`, `UR` | filter |
@@ -46,12 +46,13 @@ Retrieval scope conceptually incorporates:
 
 ```
 Academic Year + Assessment Period + Subject + Grade
-+ Approved Teaching Coverage (chapter statuses; class/section-specific overrides)
++ Approved Teaching Coverage (chapter statuses; class/section-specific overrides merged
+  per chapter with the grade+subject default — ADR-0017)
 + Selected Chapters/Sections (blueprint scope mode + materialized scope)
 + Approved Learning Materials (allowlist)
 ```
 
-- **Invariant:** `generation_scope ⊆ approved_teacing_coverage ∩ blueprint_scope`
+- **Invariant:** `generation_scope ⊆ approved_teaching_coverage ∩ blueprint_scope`
   (hard filter, fail-closed — no chunk outside the resolved scope is retried even if the
   material is APPROVED).
 - **Qdrant stays period-independent** (no `assessment_period_id` payload): scoping is

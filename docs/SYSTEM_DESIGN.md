@@ -32,9 +32,12 @@ Results: curriculum tree fully stored in MongoDB collections
 (`academic_years`, `assessment_periods`, `curriculum_coverage`, `classes`, `sections`,
 `subjects`, `chapters`, `topics`, `enrollments`). No jobs required.
 
-**Coverage inheritance:** class/section-specific coverage is used when present; otherwise
-the grade+subject default coverage applies (ADR-0017). Blueprint scope resolution follows
-this fallback rule.
+**Coverage inheritance:** resolved coverage for a class/section is a **per-chapter merge**
+of the class/section-specific record and the grade+subject default (override status wins
+where both exist; default status applies where the override omits the chapter — a partial
+override never implies that unlisted chapters do not exist) (ADR-0017). Blueprint scope
+resolution follows this rule and records per-chapter provenance (`default` |
+`class_override`).
 
 ## 2. Material ingestion & approval
 
@@ -78,7 +81,8 @@ Teacher → POST /api/v1/exam-blueprints  (school, year, **assessment_period**, 
    total_marks, duration, question counts/types, difficulty dist.,
    Bloom dist., language, instructions)
    → POST /api/v1/exam-blueprints/{id}/resolve-scope → scope materialized from approved
-     **locked coverage** (teacher reviews while DRAFT)
+     **locked coverage** (teacher reviews while DRAFT; blueprint `rev` recorded on every
+     generation run — EXAM_ENGINE §2)
 Worker-generation:
   → **revalidate materialized scope vs applicable coverage; fail closed if invalid**
   for each (chapter, type, difficulty) cell:
@@ -148,6 +152,8 @@ Teacher → GET /api/v1/verifications → review queue (original paper, crop, OC
   translation, question, key, rubric, AI score, confidence, explanation)
 Teacher → accept (→ APPROVED) / modify score / correct OCR-answer / reject
   final graded score = teacher-approved value (separate field); graders audit trail updated
+System policy: the answer-key approver of an exam must not be its sole final verifier
+(AUTH_RBAC §2b).
 Results engine: approved scores → student_attempt summaries → student/class/subject/
   chapter analytics
 ```
@@ -161,6 +167,10 @@ On finalization of an attempt (all answers verified):
   results service computes student_result, rolls into class_result, subject_result,
   chapter_performance, question stats (correctness, discrimination), analytics docs
   (precomputed or on-demand per READ path)
+Grade computation: `student_results.grade` = percentage → applicable `grading_scales`
+entry (subject-specific > grade-level > school default) → matching band → grade/pass-fail.
+No applicable scale ⇒ `grade = null` (never guessed) + warning. Detail: MONGODB_SCHEMA
+`grading_scales`.
 Admins/principals → GET /api/v1/analytics/... (paginated, filtered by tenant)
 ```
 
@@ -173,7 +183,7 @@ Admins/principals → GET /api/v1/analytics/... (paginated, filtered by tenant)
 | Examination set | `DRAFT → SCHEDULED → PUBLISHED → COMPLETED → ARCHIVED` |
 | Learning material | `UPLOADED → PROCESSING → ANALYZED → NEEDS_REVIEW → APPROVED → ARCHIVED; FAILED` |
 | Question | `CANDIDATE → NEEDS_REVIEW → APPROVED → DEPRECATED; REJECTED; (versioned)` |
-| Exam | `DRAFT → READY → PUBLISHED (locked) → ARCHIVED` |
+| Exam | `DRAFT → READY (syllabus frozen) → PUBLISHED (locked) → ARCHIVED` |
 | Paper instance | `GENERATED → PRINTED → RETURNED → PROCESSING → GRADED → VERIFIED` |
 | Grading result | `PENDING → CANDIDATE → NEEDS_REVIEW → APPROVED/REJECTED` |
 | Job | `QUEUED → RUNNING → SUCCEEDED | FAILED(RETRYABLE/NON-RETRYABLE) → CANCELED` |

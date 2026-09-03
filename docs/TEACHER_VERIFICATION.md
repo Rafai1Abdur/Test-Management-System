@@ -52,6 +52,8 @@ candidate values never mutated.
 - Filters: reason, question type, class, exam, subject, confidence range, assigned-to.
 - Assignment to teachers (manual or round-robin); per-teacher workload view.
 - Notifications on assignment/completion ([OBSERVABILITY.md](OBSERVABILITY.md)).
+- Separation of duties: the answer-key approver of an exam must not be its sole final
+  verifier (AUTH_RBAC §2b); assignment avoids key approvers as single finalizers.
 
 ## 6. Policy configuration
 

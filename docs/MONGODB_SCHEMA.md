@@ -33,6 +33,9 @@ defaults, numbering, watermark), `owner_user_id`, `status: ACTIVE|SUSPENDED`, ti
 `name`, `permissions:string[]`, `is_system`, `school_id:null|ObjectId`, timestamps.
 **Indexes:** unique `code`.
 **Lifecycle:** system roles immutable; tenant-defined roles supported later.
+**School binding:** user role assignments are school-bound — a user's effective role is
+evaluated per accessed school (`roles.school_id: null` = platform-level role), so a user
+may hold different roles in different schools (AUTH_RBAC §2b).
 
 ### `permissions`
 **Purpose:** Permission catalog (declarative).
@@ -88,6 +91,11 @@ coverage wins; otherwise grade+subject default applies. Once LOCKED and referenc
 exam scope, changes are audited and require a new exam version (syllabus lock).
 **Modeling note:** embedded `chapters[]` per ADR-0017 (small, always read together) — not a
 per-chapter collection.
+**Resolution note (ADR-0017):** class/section-specific coverage is merged with the
+grade+subject default **per chapter** (override status wins where both exist; default
+status applies where the override omits the chapter). A partial override never implies
+that unlisted chapters do not exist; scope resolution records per-chapter provenance
+(`default` | `class_override`).
 
 ### `classes`
 **Purpose:** Grade classes in a school-year.
@@ -273,12 +281,23 @@ base_period_id?, chapter_ids[], section_ids[]}`, `coverage_constraint: approved_
 `weighting_tolerance_pct` (default 10, absolute percentage points), `learning_objectives[]`,
 `total_marks`, `duration_min`,
 `question_specs:[{question_type,count,marks_each,difficulty_distribution, blooms[]}]`,
+`choice_groups?:[{id, label, question_count, attempt_count, marks_each}]` (internal
+choice "attempt any N of M" — EXAM_ENGINE §3),
 `language`, `instructions`, `scope_resolved_from` (`coverage_locked_snapshot_ref`),
-`creator`, `rev:int`, timestamps.
+`status: DRAFT|ACTIVE|ARCHIVED`, `creator`, `rev:int`, timestamps.
 **Indexes:** `(school_id, subject_id)`; `(school_id, assessment_period_id)`; unique
 `public_id`.
-**Lifecycle:** scope materialized at creation from approved/locked coverage
-(`resolve-scope`), teacher-editable while DRAFT; revalidated at generation (fail closed).
+**Lifecycle:** `DRAFT → ACTIVE → ARCHIVED`. DRAFT: editable; scope can be changed and
+(re-)resolved via `resolve-scope` from approved/locked coverage; may back a draft exam.
+ACTIVE: usable blueprint revision — must not be silently mutated in ways that alter the
+scope, question specifications, weighting, or other generation semantics of an existing
+exam that has progressed beyond DRAFT (especially at/after READY); such changes require
+a new blueprint revision (`rev++`, prior revision retained for audit). ARCHIVED:
+retained for historical/audit; not used for new exams. Scope is revalidated at
+generation (fail closed); **every generation run records the blueprint `rev` used** (in
+evidence). Scope-mode resolution algorithms and the generation-eligibility rule:
+EXAM_ENGINE §2b (`base_period_id` = earliest assessment period to include in CUMULATIVE
+resolution, same academic year only).
 
 ### `examination_sets`
 **Purpose:** Groups the exams of one assessment period (ADR-0017). e.g., Grade 8 Mid-Term
@@ -408,11 +427,27 @@ queue; `(question_id)` — question stats; `(student_id)`.
 
 ## Results & analytics
 
+### `grading_scales`
+**Purpose:** School-configurable grading scales mapping percentage → grade (no
+jurisdiction-specific system hard-coded).
+**Fields:** `school_id`, `name`, `applicability:{grade_levels?:int[], subject_ids?:[],
+academic_year_id?}` (absent = school default), `bands:[{grade, min_pct, max_pct?,
+pass:bool}]` (bands cover the complete 0–100 percentage range; omitted `max_pct` = open
+upper bound), `is_default:bool`, `status: ACTIVE|ARCHIVED`, timestamps.
+**Indexes:** unique `(school_id, name)`; `(school_id, is_default)`.
+**Resolution precedence:** subject-specific > grade-level-specific > school default.
+**Grade computation:** `percentage → applicable grading scale → matching band
+(`min_pct ≤ percentage ≤ max_pct`) → grade / pass-fail (band's `pass` flag)`.
+If no applicable grading scale exists: `student_results.grade = null` (never guessed) and
+a warning surfaces in results/report-card generation. `student_results.grade` and report
+cards are computed from this scale.
+
 ### `student_results`
 **Purpose:** Approved per-exam student outcome.
 **Fields:** `school_id`, `attempt_id`, `exam_id`, `academic_year_id`, `assessment_period_id`,
 `examination_set_id?`, `student_id`, `class_id`, `total_marks`, `obtained_marks`,
-`percentage`, `grade?`, `question_results[]` (compact), `calculated_at`, `finalized`,
+`percentage`, `grade?` (computed from the applicable `grading_scales` entry),
+`question_results[]` (compact), `calculated_at`, `finalized`,
 timestamps.
 **Indexes:** `(school_id, exam_id, class_id)`; `(school_id, student_id)`; `(school_id,
 academic_year_id, assessment_period_id)`; unique `attempt_id`.

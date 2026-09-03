@@ -26,7 +26,8 @@ printing (QR) also underpins reliable OCR processing.
    flagged in verification queue (never silently re-graded).
 7. **Syllabus lock (ADR-0017):** the examination scope/coverage (assessment period,
    coverage mode, selected chapters/sections, teaching-coverage-derived syllabus) is frozen
-   at `READY`/`APPROVED`/`PUBLISHED`. Post-publication coverage changes require a **new exam
+   at `READY` (syllabus freeze; fully locked at `PUBLISHED` — the exam lifecycle has no
+   `APPROVED` state). Post-publication coverage changes require a **new exam
    version** — never silent mutation of the published version. Coverage changes affecting a
    locked scope are audited and surface version-history entries.
 

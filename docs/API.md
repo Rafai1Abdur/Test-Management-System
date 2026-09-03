@@ -94,7 +94,7 @@ grading triggers.
 
 ### exam blueprints / exams / papers / keys
 | `/exam-blueprints` | POST/GET | create/list (schema includes assessment_period_id, examination_set_id, scope mode, weighting + tolerance) | `exams:write/read` |
-| `/exam-blueprints/{id}` | GET/PATCH/DELETE | manage (scope editable while DRAFT) | `exams:write` |
+| `/exam-blueprints/{id}` | GET/PATCH/DELETE | manage (editable while blueprint DRAFT; generation-semantics edits affecting a derived exam beyond DRAFT require a new blueprint revision) | `exams:write` |
 | `/exam-blueprints/{id}/resolve-scope` | POST | **materialize scope** from approved/locked coverage → review | `exams:write` |
 | `/exam-blueprints/{id}/generate` | POST | run generation (revalidates scope; fail closed) → `202 {job_id}` | `exams:generate` |
 | `/exams` | POST/GET | create draft / list (gains assessment_period_id, examination_set_id, blueprint_id; syllabus frozen at READY) | `exams:write/read` |
@@ -132,7 +132,7 @@ grading triggers.
 | `/results/classes` | GET | class aggregates (period filters) | `results:read` |
 | `/results/subjects` | GET | subject aggregates (period filters) | `results:read` |
 | `/results/exams/{exam_id}` | GET | exam result summary | `results:read` |
-| `/results/report-cards` | GET | report card per (student, period, exam set); school-branded template | `results:read` |
+| `/results/report-cards` | GET | report card per (student, period, exam set); school-branded template; grades from `grading_scales` | `results:read` |
 
 ### analytics / ai / models / jobs
 | `/analytics/student/{id}` | GET | performance, strengths/weaknesses (period filter) | `analytics:read` |

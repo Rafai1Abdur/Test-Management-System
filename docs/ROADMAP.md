@@ -5,7 +5,8 @@ Deliverables, Acceptance criteria, Risks, Tests.
 
 ## Phase 0 — Documentation & architecture ✅ (current)
 - **Objectives:** authoritative spec; ADR log; scope decisions.
-- **Deliverables:** this `docs/` package (see README index) + ADRs 0001–0016.
+- **Deliverables:** this `docs/` package (see README index) + ADRs 0001–0016 (as of
+  Phase 0).
 - **Acceptance:** every planned doc exists; invariants checkable; repo foundation
   (.gitignore/.gitattributes); no application code.
 - **Exit gate:** docs review sign-off; open questions resolved for Phase 1 items.
@@ -70,7 +71,7 @@ Deliverables, Acceptance criteria, Risks, Tests.
 - **Objectives:** canonical exam model; validation + publish lock; paper instances with
   QR/barcode + randomization; PDF (WeasyPrint); DOCX (Phase 2 lane); bilingual layout;
   answer-key RBAC + audit; **examination-set publication; syllabus lock** (scope immutable
-  at APPROVED/PUBLISHED — post-publication coverage change ⇒ new version).
+  at READY (syllabus freeze)/PUBLISHED — post-publication coverage change ⇒ new version).
 - **Dependencies:** Phase 4.
 - **Deliverables:** `/exams` + `/papers` + export workers; artifacts in MinIO;
   `/examination-sets/*` (publish).

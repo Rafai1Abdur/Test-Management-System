@@ -23,7 +23,9 @@ duration, per-paper orderings, question count).
 - School branding: logo (object-storage ref), name, watermark/background
 - Exam title, subject, grade, assessment period, duration, marks, section headers
 - **Report cards** (Phase 9): per (student, assessment period, examination set); school-branded
-  configurable templates with a platform default fallback; same render tree ([ADR-0017](ADR/ADR-0017-assessment-periods-coverage-exam-sets.md))
+  configurable templates with a platform default fallback; grades rendered from
+  `student_results.grade` computed via the school's `grading_scales` (MONGODB_SCHEMA);
+  same render tree ([ADR-0017](ADR/ADR-0017-assessment-periods-coverage-exam-sets.md))
 - Student info fields (name/roll/class/paper_id)
 - Instructions (per section), page numbers, headers/footers
 - Question numbering (continuous or per-section); marks column; answer spaces sized by marks

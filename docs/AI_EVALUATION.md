@@ -26,7 +26,7 @@ Capabilities: `rag`, `ocr`, `hw_en`, `hw_ur`, `translation`, `question_generatio
 | Handwriting EN | CER, WER | CER ≤ 0.10 |
 | Handwriting UR | CER, WER, + "interpretation agreement" (human-verifiable hypotheses) | CER ≤ 0.20 (Phase 2 target) |
 | Translation | chrF/COMET-style, terminology retention, human spot-checks | no regression from baseline |
-| Question generation | curriculum alignment, answer correctness (manual sample), duplicate rate, difficulty accuracy, Bloom fit, **scope violations (must be 0)**, **weighting adherence** | duplicate rate ≤ 5%; correctness ≥ 90% sampled; scope violations = 0 |
+| Question generation | curriculum alignment, answer correctness (manual sample), duplicate rate, difficulty accuracy, Bloom fit, **scope violations (must be 0)**, **coverage eligibility (IN_PROGRESS/NOT_STARTED/EXCLUDED ⇒ 0 candidates even when explicitly selected)**, **weighting adherence** | duplicate rate ≤ 5%; correctness ≥ 90% sampled; scope violations = 0 |
 | Grading | teacher-agreement (Cohen's κ), mean absolute error, score agreement, override rate, confidence calibration (ECE) | MAE ≤ 0.5 marks; κ ≥ 0.7 |
 
 ## 3. Regression gates

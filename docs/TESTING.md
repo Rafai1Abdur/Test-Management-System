@@ -36,12 +36,16 @@ prompts/models/pipelines must not regress gated metrics ([AI_EVALUATION.md](AI_E
   dispatch no double effects.
 - **Integrity tests**: publish locks; post-publish corrections require version bump; key
   access audited; paper duplicate detection; checksum mismatch flow; **syllabus lock**
-  (scope immutable at APPROVED/PUBLISHED; post-publication coverage change ⇒ new version).
+  (scope immutable at READY (syllabus freeze)/PUBLISHED; post-publication coverage change
+  ⇒ new version).
 - **State machine tests**: material/question/exam/grading lifecycle transitions incl.
   invalid transitions; **assessment period / examination set / coverage lifecycles**
   (DRAFT→REVIEWED→LOCKED coverage; set SCHEDULED→PUBLISHED).
 - **Evidence chain tests**: every AI artifact has non-null evidence refs + immutable
   snapshots; candidate-vs-final separation enforced.
+- **Coverage-eligibility tests (negative)**: a chapter that is `IN_PROGRESS`,
+  `NOT_STARTED`, or `EXCLUDED` produces **zero** generated candidates — even when
+  explicitly selected in the blueprint (fail-closed; EXAM_ENGINE §2b, AI_EVALUATION §2).
 
 ## 4. CI pipeline (planned)
 

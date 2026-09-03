@@ -31,6 +31,36 @@ version after publication — never edit a published one).
 be in the principal's `school_ids` unless `is_platform`; repositories embed this as a query
 filter (not app-level only).
 
+## 2b. Ownership & scoping (meaning of the "own …" qualifiers)
+
+The permission matrix uses scoping qualifiers ("own class", "own draft", "own exam",
+"own subjects"). They are defined by **existing domain relationships** — authorization
+scope is derived from them, not from a separate ownership registry:
+
+| Resource | Determines "own" scope |
+|---|---|
+| Teaching coverage | The teacher is teacher-of-record for the subject (`teachers.subjects`) for the class/section in scope; Admin/Principal are school-wide. |
+| Materials | The uploading user (`learning_materials.uploaded_by`); "own draft" = a material the teacher uploaded that is not yet APPROVED. |
+| Questions | The creating user while the question is CANDIDATE ("own draft"); APPROVED bank questions are school-scoped, not owner-scoped. |
+| Exams / blueprints | The creating user while the exam/blueprint is DRAFT; "own exam" (for `exams:key:read`) = the exam's creator or the subject teacher-of-record; after publication, key access follows the `exams:key:read` role scope. |
+| Answer keys | Access via `exams:key:read` plus the exam ownership rule above; every access audited (EXAM_INTEGRITY §4). |
+| Classes / sections / students | "own class" = the user is the class teacher (`classes.class_teacher_id`) or an assigned section teacher (`sections.teacher_ids`). |
+| Grading / verification | Assignment-based (`teacher_verification_items.assigned_to`); unassigned items are workable by any `grading:verify` holder. |
+| Subjects | "own subjects" = subjects listed in `teachers.subjects` for the user's school. |
+
+**Per-school role binding:** role assignments are school-bound — a user's effective
+role(s) are evaluated **per accessed school**; `roles.school_id: null` = platform-level
+role. A user may therefore hold different roles in different schools (e.g., Admin in
+school A, Teacher in school B). The tenancy check (§2 step 3) applies per school;
+permissions are evaluated against the role(s) bound to that school.
+
+**Separation of duties (exam integrity):** the answer-key approver for exam X must not
+be the sole final verifier of gradings for exam X. MVP enforcement: verification
+assignment/auto-assignment excludes the key approver (`exam_answer_keys.approval.by`)
+as the sole finalizer — another holder of `grading:verify` must be able to perform the
+final verification; the key approver may review but may not alone finalize the grading
+result for that exam.
+
 ## 3. Permission matrix (MVP)
 
 | Permission | Super Admin | Admin | Principal | Teacher | Exam Coord | Student |
@@ -57,7 +87,7 @@ filter (not app-level only).
 | `rag:read` | ✓ | ✓ | ✓ | ✓ | ✓ | – |
 | `rag:admin` | ✓ | – | – | – | – | – |
 | `questions:write` | ✓ | ✓ | ✓ | ✓ | ✓ | – |
-| `questions:approve` | ✓ | ✓ | ✓ | ✓(own)/principal-approve | ✓(draft) | – |
+| `questions:approve` | ✓ | ✓ | ✓ | ✓(own)/principal-approve | ✓ (own drafts only) | – |
 | `exams:write` | ✓ | ✓ | ✓ | ✓ | ✓ | – |
 | `exams:generate` | ✓ | ✓ | ✓ | ✓ | ✓ | – |
 | `exams:publish` | ✓ | ✓ | ✓ | ✓ | ✓ | – |
@@ -74,6 +104,11 @@ filter (not app-level only).
 | `ai:admin` / `ai:read` | ✓ | – | – | – | – | – |
 | `jobs:read` / `jobs:write` | ✓ | ✓ | ✓ | ✓ (own) | ✓ (own) | – |
 | `audit:read` | ✓ | ✓ (school) | ✓ (school) | – | – | – |
+
+**Qualifier definitions:** every "own …" qualifier above is defined in §2b (Ownership &
+scoping). Exam Coordinator `questions:approve (own drafts only)` = may approve candidate
+questions they created themselves; other candidates require
+Teacher(owner)/Principal/Admin.
 
 ## 4. Tenant isolation
 
